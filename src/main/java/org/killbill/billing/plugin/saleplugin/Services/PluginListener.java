@@ -1,4 +1,4 @@
-package org.killbill.billing.plugin.saleplugin;
+package org.killbill.billing.plugin.saleplugin.Services;
 
 import org.killbill.billing.account.api.Account;
 import org.killbill.billing.account.api.AccountApiException;
@@ -31,11 +31,11 @@ public class PluginListener implements OSGIKillbillEventDispatcher.OSGIKillbillE
 
     private static final String defaultLocale = "en_US";
 
-    public PluginListener(OSGIKillbillAPI killbillAPI, ServiceTracker<InvoiceFormatterFactory, InvoiceFormatterFactory> invoiceFormatterTracker, Properties properties, OSGIKillbillAPI killbillAPI1, ServiceTracker<InvoiceFormatterFactory, InvoiceFormatterFactory> invoiceFormatterTracker1, Properties configProperties) {
+    public PluginListener(OSGIKillbillAPI killbillAPI, ServiceTracker<InvoiceFormatterFactory, InvoiceFormatterFactory> invoiceFormatterTracker, Properties properties) {
 
-        _killbillAPI = killbillAPI1;
-        _invoiceFormatterTracker = invoiceFormatterTracker1;
-        _configProperties = configProperties;
+        _killbillAPI = killbillAPI;
+        _invoiceFormatterTracker = invoiceFormatterTracker;
+        _configProperties = properties;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.killbill.billing.plugin.saleplugin;
+package org.killbill.billing.plugin.saleplugin.Services;
 
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillAPI;
 import org.killbill.billing.plugin.api.notification.PluginTenantConfigurableConfigurationHandler;
@@ -16,7 +16,7 @@ public class PluginConfigurationHandler extends PluginTenantConfigurableConfigur
     }
 
     @Override
-    protected Properties createConfigurable(final Properties properties) {
+    public Properties createConfigurable(final Properties properties) {
         _logger.info("New properties for region {}: {}", _region, properties);
         return properties;
     }

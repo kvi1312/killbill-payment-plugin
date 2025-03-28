@@ -1,16 +1,30 @@
 package org.killbill.billing.plugin.saleplugin;
 import org.killbill.billing.invoice.plugin.api.InvoiceFormatterFactory;
+import org.killbill.billing.invoice.plugin.api.InvoicePluginApi;
+import org.killbill.billing.osgi.api.Healthcheck;
 import org.killbill.billing.osgi.libs.killbill.KillbillActivatorBase;
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillEventDispatcher;
+import org.killbill.billing.payment.plugin.api.PaymentPluginApi;
+import javax.servlet.http.HttpServlet;
 import org.killbill.billing.plugin.core.config.PluginEnvironmentConfig;
+import org.killbill.billing.plugin.core.resources.jooby.PluginApp;
+import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
 import org.killbill.billing.plugin.helloworld.MetricsGeneratorExample;
+import org.killbill.billing.plugin.saleplugin.Api.InvoiceApi;
+import org.killbill.billing.plugin.saleplugin.Api.PaymentApi;
+import org.killbill.billing.plugin.saleplugin.Extensions.ConfigUtil;
+import org.killbill.billing.plugin.saleplugin.Services.PluginConfigurationHandler;
+import org.killbill.billing.plugin.saleplugin.Services.PluginHealthCheck;
+import org.killbill.billing.plugin.saleplugin.Services.PluginListener;
+import org.killbill.billing.plugin.saleplugin.Services.PluginServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
-
+import org.killbill.billing.plugin.api.notification.PluginConfigurationEventHandler;
 import java.util.Properties;
+import org.killbill.billing.osgi.libs.killbill.OSGIKillbillEventDispatcher.OSGIFrameworkEventHandler;
 
 public class PluginActivator extends KillbillActivatorBase {
-    public static final String PLUGIN_NAME = "TemperaturePlugin";
+    public static final String PLUGIN_NAME = ConfigUtil.get("plugin.name");
 
     private PluginConfigurationHandler _configurationHandler;
     private OSGIKillbillEventDispatcher.OSGIKillbillEventHandler _killbillEventHandler;
@@ -33,23 +47,53 @@ public class PluginActivator extends KillbillActivatorBase {
         _invoiceFormatterTracker.open();
 
         _killbillEventHandler = new PluginListener(killbillAPI, _invoiceFormatterTracker, configProperties.getProperties());
+
+        final PaymentPluginApi paymentPluginApi = new PaymentApi();
+        registerPaymentPluginApi(context, paymentPluginApi);
+
+        _metricsGenerator = new MetricsGeneratorExample(metricRegistry);
+        _metricsGenerator.start();
+
+        final Healthcheck healthcheck = new PluginHealthCheck();
+        registerHealthCheck(context, healthcheck);
+
+        final InvoicePluginApi invoicePluginApi = new InvoiceApi(killbillAPI, configProperties, null);
+        registerInvoicePluginApi(context, invoicePluginApi);
+
+        final PluginApp app = new PluginAppBuilder(PLUGIN_NAME, killbillAPI, dataSource, super.clock, configProperties)
+                                                        .withRouteClass(PluginServlet.class)
+                                                        .withRouteClass(PluginHealthCheck.class)
+                                                        .withService(healthcheck).build();
+        final HttpServlet httpServlet = PluginApp.createServlet(app);
+        registerServlet(context, httpServlet);
+
+        registerHandlers();
     }
 
     @Override
     public void stop(BundleContext context) throws Exception {
+        _metricsGenerator.stop();
         super.stop(context);
     }
 
     private void registerHandlers(){
+        final PluginConfigurationEventHandler configHandler = new PluginConfigurationEventHandler(_configurationHandler);
+        dispatcher.registerEventHandlers(configHandler, (OSGIFrameworkEventHandler) () -> dispatcher.registerEventHandlers(_killbillEventHandler));
+    }
+
+    private void registerPaymentPluginApi(BundleContext context, PaymentPluginApi paymentPluginApi ) {
 
     }
 
-    private void registerPaymentPluginApi(){
+    private void registerHealthCheck(BundleContext context, Healthcheck healthcheck) {
 
     }
 
-    private void registerHealthCheck(){
+    private void registerServlet(BundleContext context, HttpServlet httpServlet){
 
+    }
+
+    private void registerInvoicePluginApi(BundleContext context, InvoicePluginApi invoicePluginApi) {
     }
 
 }
