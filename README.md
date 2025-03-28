@@ -4,3 +4,7 @@ Function
 - PluginApi : Handle payment api
 - PluginActivator : Start up class, set up configuration
 - ConfigurationHandler : Read and handle plugin's configuration
+
+NOTE
+- @Local : an annotation of jooby fw, use for marking a var that injected by the context of request -> that mean the value of var can change on each request
+- @Named : an annotation of google juice (DI lib), use to delcare what is using for inject into a @Local var
