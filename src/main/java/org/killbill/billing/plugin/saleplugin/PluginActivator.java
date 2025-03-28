@@ -2,9 +2,12 @@ package org.killbill.billing.plugin.saleplugin;
 import org.killbill.billing.invoice.plugin.api.InvoiceFormatterFactory;
 import org.killbill.billing.invoice.plugin.api.InvoicePluginApi;
 import org.killbill.billing.osgi.api.Healthcheck;
+import org.killbill.billing.osgi.api.OSGIPluginProperties;
 import org.killbill.billing.osgi.libs.killbill.KillbillActivatorBase;
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillEventDispatcher;
 import org.killbill.billing.payment.plugin.api.PaymentPluginApi;
+
+import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 import org.killbill.billing.plugin.core.config.PluginEnvironmentConfig;
 import org.killbill.billing.plugin.core.resources.jooby.PluginApp;
@@ -12,7 +15,6 @@ import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
 import org.killbill.billing.plugin.helloworld.MetricsGeneratorExample;
 import org.killbill.billing.plugin.saleplugin.Api.InvoiceApi;
 import org.killbill.billing.plugin.saleplugin.Api.PaymentApi;
-import org.killbill.billing.plugin.saleplugin.Extensions.ConfigUtil;
 import org.killbill.billing.plugin.saleplugin.Services.PluginConfigurationHandler;
 import org.killbill.billing.plugin.saleplugin.Services.PluginHealthCheck;
 import org.killbill.billing.plugin.saleplugin.Services.PluginListener;
@@ -20,11 +22,13 @@ import org.killbill.billing.plugin.saleplugin.Services.PluginServlet;
 import org.osgi.framework.BundleContext;
 import org.osgi.util.tracker.ServiceTracker;
 import org.killbill.billing.plugin.api.notification.PluginConfigurationEventHandler;
+
+import java.util.Hashtable;
 import java.util.Properties;
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillEventDispatcher.OSGIFrameworkEventHandler;
 
 public class PluginActivator extends KillbillActivatorBase {
-    public static final String PLUGIN_NAME = ConfigUtil.get("plugin.name");
+    public static final String PLUGIN_NAME = "sale-plugin";
 
     private PluginConfigurationHandler _configurationHandler;
     private OSGIKillbillEventDispatcher.OSGIKillbillEventHandler _killbillEventHandler;
@@ -82,18 +86,27 @@ public class PluginActivator extends KillbillActivatorBase {
     }
 
     private void registerPaymentPluginApi(BundleContext context, PaymentPluginApi paymentPluginApi ) {
-
+        final Hashtable<String, String> props = new Hashtable<String, String>();
+        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, PLUGIN_NAME);
+        registrar.registerService(context, PaymentPluginApi.class, paymentPluginApi, props);
     }
 
     private void registerHealthCheck(BundleContext context, Healthcheck healthcheck) {
-
+        final Hashtable<String, String> props = new Hashtable<String, String>();
+        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, PLUGIN_NAME);
+        registrar.registerService(context, Healthcheck.class, healthcheck, props);
     }
 
     private void registerServlet(BundleContext context, HttpServlet httpServlet){
-
+        final Hashtable<String, String> props = new Hashtable<String, String>();
+        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, PLUGIN_NAME);
+        registrar.registerService(context, Servlet.class, httpServlet, props);
     }
 
     private void registerInvoicePluginApi(BundleContext context, InvoicePluginApi invoicePluginApi) {
+        final Hashtable<String, String> props = new Hashtable<String, String>();
+        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, PLUGIN_NAME);
+        registrar.registerService(context, InvoicePluginApi.class, invoicePluginApi, props);
     }
 
 }
