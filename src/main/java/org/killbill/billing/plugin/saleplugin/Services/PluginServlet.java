@@ -19,7 +19,7 @@ public class PluginServlet {
     public PluginServlet(){}
     
     @GET
-    public void Hello(@Local @Named("killbill_tenant") final Optional<Tenant> tenant){
+    public void hello(@Local @Named("killbill_tenant") final Optional<Tenant> tenant){
         _logger.info("Hello from sale-plugin");
         if(tenant != null && tenant.isPresent()){
             _logger.info("Tenant is available with id {}", tenant.get().getId());
