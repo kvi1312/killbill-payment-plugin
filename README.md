@@ -1,14 +1,39 @@
-Function
-- PluginServlet : Expose endpoint and getting tenant data
-- PluginListener : Listening event from kill bill
-- PluginApi : Handle payment api
-- PluginActivator : Start up class, set up configuration
-- ConfigurationHandler : Read and handle plugin's configuration
+# **Sale Plugin for Kill Bill**
 
-NOTE
-- @Local : an annotation of jooby fw, use for marking a var that injected by the context of request -> that mean the value of var can change on each request
-- @Named : an annotation of google juice (DI lib), use to declare what is using for inject into a @Local var
+## **Overview**
 
-CMD
-- Rebuild jar file on target mvn clean package
-- kpm install_java_plugin sale --from-source-file target/sale-plugin-*-SNAPSHOT.jar --destination /var/tmp/bundles
+The **Sale Plugin** is designed for an ice cream shop, offering dynamic percentage-based discounts based on the daily temperature.  
+This plugin integrates with Kill Bill to apply conditional discounts, listen to billing events, and expose APIs for tenant-specific operations. 🐧
+
+## **Functionality**
+
+- **`PluginServlet`**: Exposes endpoints and retrieves tenant data.
+- **`PluginListener`**: Listens for events from Kill Bill.
+- **`PluginApi`**: Handles payment-related API operations.
+- **`PluginActivator`**: Acts as the startup class, configuring and initializing the plugin.
+- **`ConfigurationHandler`**: Reads and manages the plugin's configuration settings.
+
+## **Important Notes**
+
+- **Maven Bundle Plugin is required** – Without it, Tomcat will not recognize the plugin.
+- **Ensure the packaging type is set to `bundle`** to comply with OSGi requirements.
+
+## **Build and Deployment**
+
+### **Rebuild JAR file**
+
+```sh
+mvn clean package
+```
+
+### **Generate the plugin**
+
+```sh
+kpm install_java_plugin sale --from-source-file target/sale-plugin-*-SNAPSHOT.jar --destination <path_to_plugin_directory>
+```
+
+- After generate JAR file, please following these steps [Deploy-by-hand-KPM](https://docs.killbill.io/latest/plugin_installation#_deploying_by_hand)
+
+## _Read more_
+
+- [Maven Central Dependency](https://central.sonatype.com/search)

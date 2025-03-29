@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServlet;
 import org.killbill.billing.plugin.core.config.PluginEnvironmentConfig;
 import org.killbill.billing.plugin.core.resources.jooby.PluginApp;
 import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
-import org.killbill.billing.plugin.helloworld.MetricsGeneratorExample;
 import org.killbill.billing.plugin.saleplugin.Api.InvoiceApi;
 import org.killbill.billing.plugin.saleplugin.Api.PaymentApi;
 import org.killbill.billing.plugin.saleplugin.Services.PluginConfigurationHandler;
@@ -32,8 +31,6 @@ public class PluginActivator extends KillbillActivatorBase {
 
     private PluginConfigurationHandler _configurationHandler;
     private OSGIKillbillEventDispatcher.OSGIKillbillEventHandler _killbillEventHandler;
-    private MetricsGeneratorExample _metricsGenerator;
-
     private ServiceTracker<InvoiceFormatterFactory, InvoiceFormatterFactory> _invoiceFormatterTracker;
 
     @Override
@@ -55,9 +52,6 @@ public class PluginActivator extends KillbillActivatorBase {
         final PaymentPluginApi paymentPluginApi = new PaymentApi();
         registerPaymentPluginApi(context, paymentPluginApi);
 
-        _metricsGenerator = new MetricsGeneratorExample(metricRegistry);
-        _metricsGenerator.start();
-
         final Healthcheck healthcheck = new PluginHealthCheck();
         registerHealthCheck(context, healthcheck);
 
@@ -76,7 +70,6 @@ public class PluginActivator extends KillbillActivatorBase {
 
     @Override
     public void stop(BundleContext context) throws Exception {
-        _metricsGenerator.stop();
         super.stop(context);
     }
 
