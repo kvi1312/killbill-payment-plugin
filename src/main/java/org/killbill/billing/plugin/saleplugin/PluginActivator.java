@@ -14,6 +14,7 @@ import org.killbill.billing.plugin.core.resources.jooby.PluginApp;
 import org.killbill.billing.plugin.core.resources.jooby.PluginAppBuilder;
 import org.killbill.billing.plugin.saleplugin.Api.InvoiceApi;
 import org.killbill.billing.plugin.saleplugin.Api.PaymentApi;
+import org.killbill.billing.plugin.saleplugin.Extensions.CommonVariables;
 import org.killbill.billing.plugin.saleplugin.Services.PluginConfigurationHandler;
 import org.killbill.billing.plugin.saleplugin.Services.PluginHealthCheck;
 import org.killbill.billing.plugin.saleplugin.Services.PluginListener;
@@ -27,7 +28,7 @@ import java.util.Properties;
 import org.killbill.billing.osgi.libs.killbill.OSGIKillbillEventDispatcher.OSGIFrameworkEventHandler;
 
 public class PluginActivator extends KillbillActivatorBase {
-    public static final String PLUGIN_NAME = "sale-plugin";
+
 
     private PluginConfigurationHandler _configurationHandler;
     private OSGIKillbillEventDispatcher.OSGIKillbillEventHandler _killbillEventHandler;
@@ -39,7 +40,7 @@ public class PluginActivator extends KillbillActivatorBase {
         final String region = PluginEnvironmentConfig.getRegion(configProperties.getProperties());
 
         // Register an event listener for plugin configuration
-        _configurationHandler = new PluginConfigurationHandler(region, PLUGIN_NAME, killbillAPI);
+        _configurationHandler = new PluginConfigurationHandler(region, CommonVariables.PLUGIN_NAME, killbillAPI);
         final Properties globalConfiguration = _configurationHandler.createConfigurable(configProperties.getProperties());
         _configurationHandler.setDefaultConfigurable(globalConfiguration);
 
@@ -49,8 +50,8 @@ public class PluginActivator extends KillbillActivatorBase {
 
         _killbillEventHandler = new PluginListener(killbillAPI, _invoiceFormatterTracker, configProperties.getProperties());
 
-        final PaymentPluginApi paymentPluginApi = new PaymentApi();
-        registerPaymentPluginApi(context, paymentPluginApi);
+        final PaymentPluginApi pluginApi = new PaymentApi(killbillAPI, clock.getClock());
+        registerPaymentPluginApi(context, pluginApi);
 
         final Healthcheck healthcheck = new PluginHealthCheck();
         registerHealthCheck(context, healthcheck);
@@ -58,10 +59,13 @@ public class PluginActivator extends KillbillActivatorBase {
         final InvoicePluginApi invoicePluginApi = new InvoiceApi(killbillAPI, configProperties, null);
         registerInvoicePluginApi(context, invoicePluginApi);
 
-        final PluginApp app = new PluginAppBuilder(PLUGIN_NAME, killbillAPI, dataSource, super.clock, configProperties)
+        final PluginApp app = new PluginAppBuilder(CommonVariables.PLUGIN_NAME, killbillAPI, dataSource, super.clock, configProperties)
                                                         .withRouteClass(PluginServlet.class)
                                                         .withRouteClass(PluginHealthCheck.class)
-                                                        .withService(healthcheck).build();
+                                                        .withService(healthcheck)
+                                                        .withService(pluginApi)
+                                                        .withService(clock)
+                                                        .build();
         final HttpServlet httpServlet = PluginApp.createServlet(app);
         registerServlet(context, httpServlet);
 
@@ -80,25 +84,25 @@ public class PluginActivator extends KillbillActivatorBase {
 
     private void registerPaymentPluginApi(BundleContext context, PaymentPluginApi paymentPluginApi ) {
         final Hashtable<String, String> props = new Hashtable<String, String>();
-        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, PLUGIN_NAME);
+        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, CommonVariables.PLUGIN_NAME);
         registrar.registerService(context, PaymentPluginApi.class, paymentPluginApi, props);
     }
 
     private void registerHealthCheck(BundleContext context, Healthcheck healthcheck) {
         final Hashtable<String, String> props = new Hashtable<String, String>();
-        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, PLUGIN_NAME);
+        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, CommonVariables.PLUGIN_NAME);
         registrar.registerService(context, Healthcheck.class, healthcheck, props);
     }
 
     private void registerServlet(BundleContext context, HttpServlet httpServlet){
         final Hashtable<String, String> props = new Hashtable<String, String>();
-        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, PLUGIN_NAME);
+        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, CommonVariables.PLUGIN_NAME);
         registrar.registerService(context, Servlet.class, httpServlet, props);
     }
 
     private void registerInvoicePluginApi(BundleContext context, InvoicePluginApi invoicePluginApi) {
         final Hashtable<String, String> props = new Hashtable<String, String>();
-        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, PLUGIN_NAME);
+        props.put(OSGIPluginProperties.PLUGIN_NAME_PROP, CommonVariables.PLUGIN_NAME);
         registrar.registerService(context, InvoicePluginApi.class, invoicePluginApi, props);
     }
 
