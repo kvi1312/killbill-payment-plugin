@@ -143,7 +143,7 @@ public class PaymentApi implements PaymentPluginApi {
                 currency,
                 PaymentPluginStatus.PROCESSED,
                 "Purchase processed with temperature discount",
-                "Temperature: " + temperature + "°C, Discount: " + discountPercent + "%", // gatewayErrorCode
+                "Discount: " + discountPercent, // gatewayErrorCode
                 null,                                              // firstPaymentReferenceId
                 null,                                              // secondPaymentReferenceId
                 context.getCreatedDate(),                          // createdDate
