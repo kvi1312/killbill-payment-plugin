@@ -8,6 +8,7 @@ import org.killbill.billing.payment.api.PaymentMethodPlugin;
 import org.killbill.billing.payment.api.PluginProperty;
 import org.killbill.billing.payment.api.TransactionType;
 import org.killbill.billing.payment.plugin.api.*;
+import org.killbill.billing.plugin.saleplugin.Extensions.ConfigLoader;
 import org.killbill.billing.plugin.saleplugin.Extensions.SalePluginPaymentTransactionInfoPlugin;
 import org.killbill.billing.util.callcontext.CallContext;
 import org.killbill.billing.util.callcontext.TenantContext;
@@ -29,9 +30,9 @@ public class PaymentApi implements PaymentPluginApi {
     private static final Logger _logger = LoggerFactory.getLogger(PaymentApi.class);
     private OSGIKillbillAPI _killbillAPI;
     private Clock _clock;
-    private static String WEATHER_API_KEY = "c8e1614ad55c63265696c91270807d80";
-    private static final String WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather";
-    private static final String DEFAULT_CITY = "Hanoi,vn"; //
+    private static final String WEATHER_API_KEY = ConfigLoader.getProperty("weather.api.key");
+    private static final String WEATHER_API_URL = ConfigLoader.getProperty("weather.api.url");
+    private static final String DEFAULT_CITY = ConfigLoader.getProperty("weather.api.default.city");
 
     private static final double MAX_DISCOUNT_PERCENT = 50.0;
 

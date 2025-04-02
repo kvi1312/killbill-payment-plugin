@@ -1,11 +1,11 @@
 # **Sale Plugin for Kill Bill**
 
-## **Overview**
+## **1. Overview**
 
 The **Sale Plugin** is designed for an ice cream shop, offering dynamic percentage-based discounts based on the daily temperature.  
 This plugin integrates with Kill Bill to apply conditional discounts, listen to billing events, and expose APIs for tenant-specific operations. 🐧
 
-## **Functionality**
+## **2. Functionality**
 
 - **`PluginServlet`**: Exposes endpoints and retrieves tenant data.
 - **`PluginListener`**: Listens for events from Kill Bill.
@@ -13,12 +13,12 @@ This plugin integrates with Kill Bill to apply conditional discounts, listen to 
 - **`PluginActivator`**: Acts as the startup class, configuring and initializing the plugin.
 - **`ConfigurationHandler`**: Reads and manages the plugin's configuration settings.
 
-## **Important Notes**
+## **3. Important Notes**
 
 - **Maven Bundle Plugin is required** – Without it, Tomcat will not recognize the plugin.
 - **Ensure the packaging type is set to `bundle`** to comply with OSGi requirements.
 
-## **Build and Deployment**
+## **4. Build and Deployment**
 
 ### **Rebuild JAR file**
 
@@ -33,7 +33,12 @@ kpm install_java_plugin sale --from-source-file target/sale-plugin-*-SNAPSHOT.ja
 ```
 
 - After generate JAR file, please following these steps [Deploy-by-hand-KPM](https://docs.killbill.io/latest/plugin_installation#_deploying_by_hand)
-
+- Create **application.properties** file in src/main/resources and fill these following value
+```sh
+weather.api.key= <YOUR_OPEN_WEATHER_API_KEY>
+weather.api.url= <YOUR_OPEN_WEATHER_API_URL>
+weather.api.default.city= <CITY_TO_GET_WEATHTER>
+```
 ### Set up Account
 1. Create a Kill Bill account for the customer (The following request uses the default Kill Bill API key and secret, change them if needed):
 
